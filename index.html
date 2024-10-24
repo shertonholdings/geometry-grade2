@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic Geometry</title>
+    <style>
+        /* Add your CSS styling here */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .shape {
+            display: block;
+            margin: 20px auto;
+            max-width: 200px; /* Adjust size as needed */
+        }
+        .options {
+            display: flex;
+            justify-content: center;
+            margin: 20px;
+        }
+        .option {
+            border: 2px solid blue;
+            background-color: lightblue;
+            margin: 5px;
+            padding: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .option:hover {
+            background-color: lightcyan;
+        }
+        .selected {
+            background-color: yellow;
+        }
+        #logo {
+            margin: 20px 0;
+        }
+        #moreLessons {
+            margin: 20px;
+            padding: 10px 20px;
+            background-color: blue;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #outcome {
+            margin: 20px;
+            font-size: 1.2em;
+        }
+        .correct {
+            color: darkgreen;
+        }
+        .incorrect {
+            color: darkred;
+        }
+    </style>
+</head>
+<body>
+    <h1>Basic Geometry: Shapes and Properties</h1>
+    <div id="logo">
+        <img src="https://i.imgur.com/mwpTHJj.png" alt="Logo" width="100">
+    </div>
+    <img id="shapeImage" class="shape" src="" alt="Shape">
+    
+    <div id="question1"></div>
+    <div class="options" id="options1"></div>
+    
+    <div id="question2"></div>
+    <div class="options" id="options2"></div>
+
+    <div id="outcome"></div>
+
+    <button id="moreLessons" onclick="window.location.href='https://sites.google.com/view/grades-2/home'">More Lessons</button>
+
+    <script>
+        const shapes = [
+            {name: "Rectangle", sides: 4, url: "https://i.imgur.com/zV50lrZ.png"},
+            {name: "Triangle", sides: 3, url: "https://i.imgur.com/A37gAF8.png"},
+            {name: "Square", sides: 4, url: "https://i.imgur.com/hMMSgv3.png"},
+            {name: "Circle", sides: 0, url: "https://i.imgur.com/zX12tA4.png"},
+            {name: "Oval", sides: 0, url: "https://i.imgur.com/aCysEFV.png"},
+            {name: "Star", sides: 10, url: "https://i.imgur.com/097jLvE.png"} // Updated sides for the star
+        ];
+
+        let currentShape;
+        let selectedSides = null;
+        let selectedName = null;
+
+        function getRandomShape() {
+            return shapes[Math.floor(Math.random() * shapes.length)];
+        }
+
+        function loadShape() {
+            currentShape = getRandomShape();
+            document.getElementById("shapeImage").src = currentShape.url;
+            document.getElementById("question1").innerText = "How many sides does this shape have?";
+            document.getElementById("question2").innerText = "Which shape is this?";
+            populateOptions(currentShape);
+            resetSelections();
+            document.getElementById("outcome").innerText = ""; // Reset outcome message
+        }
+
+        function populateOptions(shape) {
+            // Populate sides options
+            const sidesOptions = [shape.sides, shape.sides + 1, shape.sides - 1];
+            shuffle(sidesOptions);
+            document.getElementById("options1").innerHTML = sidesOptions.map(option => 
+                `<div class="option" onclick="selectSides(${option}, this)">${option}</div>`).join('');
+
+            // Populate shape name options
+            const nameOptions = [shape.name, "Circle", "Square", "Triangle", "Rectangle", "Oval", "Star"];
+            shuffle(nameOptions);
+            document.getElementById("options2").innerHTML = nameOptions.map(option => 
+                `<div class="option" onclick="selectName('${option}', this)">${option}</div>`).join('');
+        }
+
+        function selectSides(selected, element) {
+            selectedSides = selected;
+            highlightOption(element, 'options1');
+            checkAnswers();
+        }
+
+        function selectName(selected, element) {
+            selectedName = selected;
+            highlightOption(element, 'options2');
+            checkAnswers();
+        }
+
+        function highlightOption(selectedElement, optionsId) {
+            const options = document.getElementById(optionsId).children;
+            for (let option of options) {
+                option.classList.remove('selected');
+            }
+            selectedElement.classList.add('selected');
+        }
+
+        function checkAnswers() {
+            if (selectedSides !== null && selectedName !== null) {
+                const outcomeElement = document.getElementById("outcome");
+                if (selectedSides === currentShape.sides && selectedName === currentShape.name) {
+                    outcomeElement.innerText = "Correct! Let's move to the next shape.";
+                    outcomeElement.className = "outcome correct"; // Add correct class
+                    setTimeout(loadShape, 2000); // Move to the next shape after 2 seconds
+                } else {
+                    outcomeElement.innerText = "Incorrect! Try again.";
+                    outcomeElement.className = "outcome incorrect"; // Add incorrect class
+                    resetSelections();
+                    clearHighlights(); // Clear highlights for incorrect answers
+                }
+            }
+        }
+
+        function clearHighlights() {
+            const options1 = document.getElementById("options1").children;
+            const options2 = document.getElementById("options2").children;
+            for (let option of options1) {
+                option.classList.remove('selected');
+            }
+            for (let option of options2) {
+                option.classList.remove('selected');
+            }
+        }
+
+        function resetSelections() {
+            selectedSides = null;
+            selectedName = null;
+        }
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        window.onload = loadShape;
+    </script>
+</body>
+</html>
